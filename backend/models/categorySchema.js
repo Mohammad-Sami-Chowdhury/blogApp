@@ -6,12 +6,12 @@ const categorySchema = new Schema({
     type: String,
     trim: true,
   },
-//   products: [
-//     {
-//       type: Schema.Types.ObjectId,
-//       ref: "Product",
-//     },
-//   ],
+  blogs: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Blogs",
+    },
+  ],
 });
 
 module.exports = mongoose.model("Category", categorySchema);

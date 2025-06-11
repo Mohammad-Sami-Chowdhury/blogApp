@@ -2,6 +2,8 @@ const blogSchema = require("../models/blogSchema");
 const categorySchema = require("../models/categorySchema");
 const uploadResult = require("../middleware/cloudinary");
 const createBlogController = async (req, res) => {
+  console.log(req.body);
+  
   try {
     // Access form data from req.body and req.file
     const { description, title, subTitle, category } = req.body;
