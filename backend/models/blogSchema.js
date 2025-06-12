@@ -5,7 +5,7 @@ const blogSchema = new Schema({
   subTitle: { type: String, required: true },
   description: { type: String, required: true },
   blogImg: { type: String },
-  category: { type: Schema.Types.ObjectId, ref: "Category", required: true },
+  category: { type: Schema.Types.ObjectId, ref: "Category" },
   createdAt: {
     type: Date,
     default: Date.now,

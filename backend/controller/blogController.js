@@ -32,7 +32,7 @@ const createBlogController = async (req, res) => {
 
     // Update category and subcategory
     await categorySchema.findByIdAndUpdate(category, {
-      $push: { blog: savedBlog._id },
+      $push: { blogs: savedBlog._id }, // should be blogs, not blog
     });
 
     res.status(201).json({
