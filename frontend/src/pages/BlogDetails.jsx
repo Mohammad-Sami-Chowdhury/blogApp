@@ -15,6 +15,9 @@ import "../App.css"
 const BlogDetails = () => {
   const { id } = useParams();
   const [blog, setBlog] = useState(null);
+  const [comments, setComments] = useState([]);
+  const [commentName, setCommentName] = useState("");
+  const [commentText, setCommentText] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -24,6 +27,7 @@ const BlogDetails = () => {
         setLoading(true);
         const res = await axios.get(`http://localhost:5000/api/v1/blog/getsingleblog/${id}`);
         setBlog(res.data.data);
+        setComments(res.data.data.comments || []);
       } catch (err) {
         setError("Blog not found!");
       } finally {
@@ -32,6 +36,18 @@ const BlogDetails = () => {
     }
     fetchBlog();
   }, [id]);
+
+  const handleCommentSubmit = async (e) => {
+    e.preventDefault();
+    if (!commentName.trim() || !commentText.trim()) return;
+    const res = await axios.post(
+      `http://localhost:5000/api/v1/comment/createcomment/${id}`,
+      { name: commentName, comment: commentText }
+    );
+    setComments([...comments, res.data.data]);
+    setCommentName("");
+    setCommentText("");
+  };
 
   if (loading) return <div className="text-center mt-20">Loading...</div>;
   if (error) return <div className="text-center mt-20 text-red-500">{error}</div>;
@@ -73,52 +89,43 @@ const BlogDetails = () => {
         />
         <div>
           <h5 className="text-2xl font-semibold text-[#3b3b3b] mt-[46px] w-[984px] mx-auto leading-[45px]">
-            Comments (5)
+            Comments ({comments.length})
           </h5>
           <div className="w-[984px] mx-auto mt-6">
-            <div className="flex items-center gap-4 mb-6 justify-between">
-              <div className="flex items-center gap-4">
-                <IoPersonCircleOutline className="text-[40px] text-[#818182]" />
-                <div>
-                  <p className="text-lg font-semibold text-[#3b3b3b]">
-                    John Doe
-                  </p>
-                  <p className="text-base text-[#4b4b4b]">
-                    This is a great article! I found the tips very helpful.
-                  </p>
+            {comments.map((c, idx) => (
+              <div key={idx} className="flex items-center gap-4 mb-6 justify-between">
+                <div className="flex items-center gap-4">
+                  <IoPersonCircleOutline className="text-[40px] text-[#818182]" />
+                  <div>
+                    <p className="text-lg font-semibold text-[#3b3b3b]">{c.name}</p>
+                    <p className="text-base text-[#4b4b4b]">{c.comment}</p>
+                  </div>
                 </div>
+                <p>
+                  {c.createdAt
+                    ? new Date(c.createdAt).toLocaleDateString()
+                    : ""}
+                </p>
               </div>
-              <p>21 days ago</p>
-            </div>
-            <div className="flex items-center gap-4 mb-6 justify-between">
-              <div className="flex items-center gap-4">
-                <IoPersonCircleOutline className="text-[40px] text-[#818182]" />
-                <div>
-                  <p className="text-lg font-semibold text-[#3b3b3b]">
-                    Jane Smith
-                  </p>
-                  <p className="text-base text-[#4b4b4b]">
-                    I love the step-by-step approach. It makes it easy to
-                    follow!
-                  </p>
-                </div>
-              </div>
-              <p>1 month ago</p>
-            </div>
+            ))}
           </div>
           <div>
             <p className="text-2xl font-semibold text-[#3b3b3b] mt-[46px] w-[984px] mx-auto leading-[45px]">
               Add your Comment
             </p>
-            <form className="mt-4 flex flex-col items-center">
+            <form className="mt-4 flex flex-col items-center" onSubmit={handleCommentSubmit}>
               <input
                 className="w-full max-w-[600px] h-[50px] p-4 border border-[#dcdcdc] rounded-lg focus:outline-none focus:border-[#5044E5]"
                 type="text"
                 placeholder="Your Name"
+                value={commentName}
+                onChange={(e) => setCommentName(e.target.value)}
               />
               <textarea
                 className="w-full max-w-[600px] h-[300px] p-4 border border-[#dcdcdc] rounded-lg focus:outline-none focus:border-[#5044E5] mt-4"
                 placeholder="Write your comment here..."
+                value={commentText}
+                onChange={(e) => setCommentText(e.target.value)}
               ></textarea>
               <button
                 type="submit"

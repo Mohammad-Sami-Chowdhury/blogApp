@@ -26,6 +26,7 @@ const createBlogController = async (req, res) => {
       subTitle,
       category,
       blogImg: imgUrl.secure_url || null,
+      status: req.body.status || "draft",
     });
 
     const savedBlog = await blog.save();
@@ -48,6 +49,102 @@ const createBlogController = async (req, res) => {
     });
   }
 };
+
+// Draft blog create
+async function createDraftBlogController(req, res) {
+  try {
+    // Access form data from req.body and req.file
+    const { description, title, subTitle, category } = req.body;
+
+    const fileName = req.file.path;
+    const imgUrl = await uploadResult(fileName);
+
+    // Validate required fields
+    if (!description || !title || !subTitle || !category) {
+      return res.status(400).json({
+        message: "Missing required fields",
+        status: "Error",
+      });
+    }
+
+    // Create the product
+    const blog = new blogSchema({
+      description,
+      title,
+      subTitle,
+      category,
+      blogImg: imgUrl.secure_url || null,
+      status: "draft",
+    });
+
+    await blog.save();
+
+    // Update category and subcategory
+    await categorySchema.findByIdAndUpdate(category, {
+      $push: { blogs: blog._id }, // should be blogs, not blog
+    });
+
+    res.status(201).json({
+      message: "Draft blog created",
+      status: "Success",
+      data: blog,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to create draft",
+      status: "Error",
+      error: error.message,
+    });
+  }
+}
+
+// Publish blog create
+async function createPublishedBlogController(req, res) {
+  try {
+    // Access form data from req.body and req.file
+    const { description, title, subTitle, category } = req.body;
+
+    const fileName = req.file.path;
+    const imgUrl = await uploadResult(fileName);
+
+    // Validate required fields
+    if (!description || !title || !subTitle || !category) {
+      return res.status(400).json({
+        message: "Missing required fields",
+        status: "Error",
+      });
+    }
+
+    // Create the product
+    const blog = new blogSchema({
+      description,
+      title,
+      subTitle,
+      category,
+      blogImg: imgUrl.secure_url || null,
+      status: "published",
+    });
+
+    await blog.save();
+
+    // Update category and subcategory
+    await categorySchema.findByIdAndUpdate(category, {
+      $push: { blogs: blog._id }, // should be blogs, not blog
+    });
+
+    res.status(201).json({
+      message: "Published blog created",
+      status: "Success",
+      data: blog,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to create blog",
+      status: "Error",
+      error: error.message,
+    });
+  }
+}
 
 async function getAllBlogController(req, res) {
   try {
@@ -135,6 +232,8 @@ async function getBlogsByCategoryController(req, res) {
 
 module.exports = {
   createBlogController,
+  createDraftBlogController,
+  createPublishedBlogController,
   getAllBlogController,
   getBlogsByCategoryController,
   getSingleBlogController,

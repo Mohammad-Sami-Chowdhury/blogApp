@@ -6,6 +6,11 @@
   --font-outfit: "Outfit", sans-serif;
   --font-poppins: "Poppins", sans-serif;
 }
+
+.ql-editor {
+  min-height: 300px;
+  height: 300px;
+}
 .ql-editor h1 {
   font-size: 3rem !important;
   font-weight: bold !important;

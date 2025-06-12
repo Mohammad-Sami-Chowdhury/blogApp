@@ -2,8 +2,11 @@ import React, { useState, useEffect, useRef } from "react";
 import Quill from "quill";
 import "quill/dist/quill.snow.css";
 import axios from "axios";
+import { IoPersonCircleOutline } from "react-icons/io5";
+import { useParams } from "react-router-dom";
 
 const AddBlogs = () => {
+  const { id } = useParams();
   const [thumbnail, setThumbnail] = useState(null);
   const [thumbnailFile, setThumbnailFile] = useState(null);
   const [blogTitle, setBlogTitle] = useState("");
@@ -11,27 +14,30 @@ const AddBlogs = () => {
   const [blogCategory, setBlogCategory] = useState("");
   const [message, setMessage] = useState("");
   const [categories, setCategories] = useState([]);
+  const [publishNow, setPublishNow] = useState(false);
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
 
   const editorRef = useRef(null);
   const quillInstance = useRef(null);
 
   useEffect(() => {
-  if (editorRef.current && !editorRef.current.firstChild) {
-    quillInstance.current = new Quill(editorRef.current, {
-      modules: {
-        toolbar: [
-          [{ header: [1, 2, 3, false] }],
-          ["bold", "italic", "underline"],
-          [{ list: "ordered" }, { list: "bullet" }],
-          ["link", "image"],
-          ["clean"],
-        ],
-      },
-      placeholder: "Write your blog content here...",
-      theme: "snow",
-    });
-  }
-}, []);
+    if (editorRef.current && !editorRef.current.firstChild) {
+      quillInstance.current = new Quill(editorRef.current, {
+        modules: {
+          toolbar: [
+            [{ header: [1, 2, 3, false] }],
+            ["bold", "italic", "underline"],
+            [{ list: "ordered" }, { list: "bullet" }],
+            ["link", "image"],
+            ["clean"],
+          ],
+        },
+        placeholder: "Write your blog content here...",
+        theme: "snow",
+      });
+    }
+  }, []);
 
   // Fetch categories
   useEffect(() => {
@@ -78,7 +84,8 @@ const AddBlogs = () => {
     formData.append("subTitle", subTitle);
     formData.append("description", description);
     formData.append("category", blogCategory);
-    
+    formData.append("status", publishNow ? "published" : "draft");
+
     if (thumbnailFile) {
       formData.append("blogImg", thumbnailFile);
     }
@@ -95,18 +102,19 @@ const AddBlogs = () => {
       );
 
       setMessage("Blog added successfully!");
-      
+
       // Reset form
       setBlogTitle("");
       setSubTitle("");
       setBlogCategory("");
       setThumbnail(null);
       setThumbnailFile(null);
-      
+      setPublishNow(false);
+
       if (quillInstance.current) {
         quillInstance.current.root.innerHTML = "";
       }
-      
+
       // Clear message after 3 seconds
       setTimeout(() => setMessage(""), 3000);
     } catch (err) {
@@ -118,10 +126,27 @@ const AddBlogs = () => {
     }
   };
 
+  const handleAIGenerate = async () => {
+    if (!title.trim()) return;
+    try {
+      const res = await axios.post(
+        "http://localhost:5000/api/v1/ai/generate-description",
+        {
+          title,
+        }
+      );
+      setDescription(res.data.description);
+    } catch {
+      alert("AI description generate hoy nai!");
+    }
+  };
+
   return (
     <div className="max-w-4xl font-outfit mx-auto p-6 bg-white rounded-lg shadow-md text-[#515151]">
-      <h1 className="text-2xl font-bold mb-6 text-center">Create New Blog Post</h1>
-      
+      <h1 className="text-2xl font-bold mb-6 text-center">
+        Create New Blog Post
+      </h1>
+
       <form onSubmit={handleSubmit}>
         {/* Thumbnail Upload */}
         <div className="mb-6">
@@ -170,14 +195,23 @@ const AddBlogs = () => {
           <label className="block text-sm font-medium mb-2">
             Blog title <span className="text-red-500">*</span>
           </label>
-          <input
-            type="text"
-            value={blogTitle}
-            onChange={(e) => setBlogTitle(e.target.value)}
-            placeholder="Enter blog title"
-            className="w-full p-3 border border-[#CCCCCC] rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          />
+          <div className="flex items-center gap-2">
+            <input
+              type="text"
+              value={blogTitle}
+              onChange={(e) => setBlogTitle(e.target.value)}
+              placeholder="Enter blog title"
+              className="w-full p-3 border border-[#CCCCCC] rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+            <button
+              type="button"
+              onClick={handleAIGenerate}
+              className="px-4 py-2 bg-blue-500 text-white rounded"
+            >
+              Write with AI
+            </button>
+          </div>
         </div>
 
         {/* Sub Title */}
@@ -197,10 +231,7 @@ const AddBlogs = () => {
           <label className="block text-sm font-medium mb-2">
             Blog content <span className="text-red-500">*</span>
           </label>
-          <div
-            ref={editorRef}
-            className="border border-[#CCCCCC] rounded-lg"
-          />
+          <div ref={editorRef} className="border border-[#CCCCCC] rounded-lg" />
         </div>
 
         {/* Blog Category */}
@@ -222,11 +253,20 @@ const AddBlogs = () => {
             ))}
           </select>
         </div>
+        <div className="mt-6 flex items-center gap-2">
+          <p>Publish now</p>
+          <input
+            type="checkbox"
+            checked={publishNow}
+            onChange={(e) => setPublishNow(e.target.checked)}
+          />
+        </div>
 
         {/* Submit Button */}
         <div className="flex justify-between items-center mt-8">
           <div className="text-sm text-gray-600">
-            Fields marked with <span className="text-red-500">*</span> are required
+            Fields marked with <span className="text-red-500">*</span> are
+            required
           </div>
           <button
             type="submit"
@@ -235,13 +275,15 @@ const AddBlogs = () => {
             Publish Blog
           </button>
         </div>
-        
+
         {message && (
-          <div className={`mt-4 p-3 rounded-lg text-center ${
-            message.includes("successfully") 
-              ? "bg-green-100 text-green-700" 
-              : "bg-red-100 text-red-700"
-          }`}>
+          <div
+            className={`mt-4 p-3 rounded-lg text-center ${
+              message.includes("successfully")
+                ? "bg-green-100 text-green-700"
+                : "bg-red-100 text-red-700"
+            }`}
+          >
             {message}
           </div>
         )}

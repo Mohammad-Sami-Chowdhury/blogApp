@@ -10,6 +10,18 @@ const blogSchema = new Schema({
     type: Date,
     default: Date.now,
   },
+  status: {
+    type: String,
+    enum: ["published", "draft"],
+    default: "draft",
+  },
+  comments: [
+    {
+      name: String,
+      comment: String,
+      createdAt: { type: Date, default: Date.now },
+    },
+  ],
 });
 
 module.exports = mongoose.model("Blog", blogSchema);
