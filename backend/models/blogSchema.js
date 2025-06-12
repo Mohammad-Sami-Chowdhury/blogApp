@@ -6,6 +6,10 @@ const blogSchema = new Schema({
   description: { type: String, required: true },
   blogImg: { type: String },
   category: { type: Schema.Types.ObjectId, ref: "Category", required: true },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
 module.exports = mongoose.model("Blog", blogSchema);

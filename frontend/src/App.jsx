@@ -4,6 +4,7 @@ import "./App.css";
 import Registration from "./pages/Registration";
 import Login from "./pages/Login";
 import OtpVerify from "./pages/OtpVerify";
+import BlogDetails from "./pages/BlogDetails";
 
 const router = createBrowserRouter([
   {
@@ -22,6 +23,10 @@ const router = createBrowserRouter([
     path: "otp-verification",
     element: <OtpVerify />,
   },
+  {
+    path: "blog/:id",
+    element: <BlogDetails/>
+  }
 ]);
 
 function App() {

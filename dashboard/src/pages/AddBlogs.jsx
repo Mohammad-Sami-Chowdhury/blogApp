@@ -15,31 +15,6 @@ const AddBlogs = () => {
   const editorRef = useRef(null);
   const quillInstance = useRef(null);
 
-  // Initialize Quill editor
-  // useEffect(() => {
-  //   if (editorRef.current && !quillInstance.current) {
-  //     quillInstance.current = new Quill(editorRef.current, {
-  //       modules: {
-  //         toolbar: [
-  //           [{ header: [1, 2, 3, false] }],
-  //           ["bold", "italic", "underline"],
-  //           [{ list: "ordered" }, { list: "bullet" }],
-  //           ["link", "image"],
-  //           ["clean"],
-  //         ],
-  //       },
-  //       placeholder: "Write your blog content here...",
-  //       theme: "snow",
-  //     });
-  //   }
-
-  //   return () => {
-  //     if (quillInstance.current) {
-  //       quillInstance.current = null;
-  //     }
-  //   };
-  // }, []);
-
   useEffect(() => {
   if (editorRef.current && !editorRef.current.firstChild) {
     quillInstance.current = new Quill(editorRef.current, {
@@ -56,7 +31,6 @@ const AddBlogs = () => {
       theme: "snow",
     });
   }
-  // No need to set quillInstance.current = null in cleanup
 }, []);
 
   // Fetch categories
@@ -145,7 +119,7 @@ const AddBlogs = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md text-[#515151]">
+    <div className="max-w-4xl font-outfit mx-auto p-6 bg-white rounded-lg shadow-md text-[#515151]">
       <h1 className="text-2xl font-bold mb-6 text-center">Create New Blog Post</h1>
       
       <form onSubmit={handleSubmit}>
