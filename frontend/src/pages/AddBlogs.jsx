@@ -2,11 +2,10 @@ import React, { useState, useEffect, useRef } from "react";
 import Quill from "quill";
 import "quill/dist/quill.snow.css";
 import axios from "axios";
-import { IoPersonCircleOutline } from "react-icons/io5";
-import { useParams } from "react-router-dom";
+import toast, { Toaster } from "react-hot-toast";
 
 const AddBlogs = () => {
-  const { id } = useParams();
+
   const [thumbnail, setThumbnail] = useState(null);
   const [thumbnailFile, setThumbnailFile] = useState(null);
   const [blogTitle, setBlogTitle] = useState("");
@@ -15,8 +14,6 @@ const AddBlogs = () => {
   const [message, setMessage] = useState("");
   const [categories, setCategories] = useState([]);
   const [publishNow, setPublishNow] = useState(false);
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
 
   const editorRef = useRef(null);
   const quillInstance = useRef(null);
@@ -65,7 +62,6 @@ const AddBlogs = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setMessage("");
 
     // Get content from Quill editor
     const description = quillInstance.current
@@ -74,7 +70,7 @@ const AddBlogs = () => {
 
     // Validate required fields
     if (!blogTitle.trim() || !blogCategory || !description.trim()) {
-      setMessage("Please fill in all required fields");
+      toast.error("Please fill in all required fields");
       return;
     }
 
@@ -101,7 +97,7 @@ const AddBlogs = () => {
         }
       );
 
-      setMessage("Blog added successfully!");
+      toast.success("Blog added successfully!");
 
       // Reset form
       setBlogTitle("");
@@ -118,7 +114,7 @@ const AddBlogs = () => {
       // Clear message after 3 seconds
       setTimeout(() => setMessage(""), 3000);
     } catch (err) {
-      setMessage(
+      toast.error(
         err.response?.data?.message ||
           err.response?.data?.error ||
           "Failed to add blog"
@@ -126,22 +122,9 @@ const AddBlogs = () => {
     }
   };
 
-  const handleAIGenerate = async () => {
-    if (!title.trim()) return;
-    try {
-      const res = await axios.post(
-        "http://localhost:5000/api/v1/ai/generate-description",
-        {
-          title,
-        }
-      );
-      setDescription(res.data.description);
-    } catch {
-      alert("AI description generate hoy nai!");
-    }
-  };
-
   return (
+    <>
+    <Toaster/>
     <div className="max-w-4xl font-outfit mx-auto p-6 bg-white rounded-lg shadow-md text-[#515151]">
       <h1 className="text-2xl font-bold mb-6 text-center">
         Create New Blog Post
@@ -195,23 +178,15 @@ const AddBlogs = () => {
           <label className="block text-sm font-medium mb-2">
             Blog title <span className="text-red-500">*</span>
           </label>
-          <div className="flex items-center gap-2">
-            <input
-              type="text"
-              value={blogTitle}
-              onChange={(e) => setBlogTitle(e.target.value)}
-              placeholder="Enter blog title"
-              className="w-full p-3 border border-[#CCCCCC] rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-            <button
-              type="button"
-              onClick={handleAIGenerate}
-              className="px-4 py-2 bg-blue-500 text-white rounded"
-            >
-              Write with AI
-            </button>
-          </div>
+
+          <input
+            type="text"
+            value={blogTitle}
+            onChange={(e) => setBlogTitle(e.target.value)}
+            placeholder="Enter blog title"
+            className="w-full p-3 border border-[#CCCCCC] rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
+            required
+          />
         </div>
 
         {/* Sub Title */}
@@ -289,6 +264,7 @@ const AddBlogs = () => {
         )}
       </form>
     </div>
+    </>
   );
 };
 

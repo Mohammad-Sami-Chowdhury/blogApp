@@ -2,27 +2,28 @@ import React, { useState } from "react";
 import axios from "axios";
 import Container from "../components/Container";
 import { useNavigate } from "react-router-dom";
+import toast, { Toaster } from "react-hot-toast";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setMessage("");
     try {
-      const res = await axios.post("http://localhost:5000/api/v1/authentication/login", {
-        email,
-        password,
-      });
+      const res = await axios.post(
+        "http://localhost:5000/api/v1/authentication/login",
+        {
+          email,
+          password,
+        }
+      );
       localStorage.setItem("token", res.data.token);
-      setMessage("Login successful!");
-      // Optional: Redirect to dashboard
-     navigate("/dashboard");
+      toast.success("Login successful!");
+      navigate("/dashboard");
     } catch (err) {
-      setMessage(
+      toast.error(
         err.response?.data?.error ||
           err.response?.data?.message ||
           "Login failed"
@@ -32,6 +33,7 @@ const Login = () => {
 
   return (
     <Container>
+      <Toaster />
       <div className="flex items-center justify-center min-h-screen">
         <form
           onSubmit={handleLogin}
@@ -81,9 +83,6 @@ const Login = () => {
           >
             Login
           </button>
-          {message && (
-            <div className="mt-4 text-center text-red-500">{message}</div>
-          )}
         </form>
       </div>
     </Container>

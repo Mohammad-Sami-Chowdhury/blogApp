@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import Container from "../components/Container";
 import axios from "axios";
+import toast, { Toaster } from "react-hot-toast";
 
 const OtpVerify = () => {
   const [otp, setOtp] = useState("");
-  const [message, setMessage] = useState("");
   const email = localStorage.getItem("pendingEmail");
 
   const handleChange = (e) => {
@@ -19,14 +19,15 @@ const OtpVerify = () => {
         "http://localhost:5000/api/v1/authentication/otpverification",
         { otp, email }
       );
-      setMessage(res.data.message || "OTP verified successfully!");
+      toast.success(res.data.message || "OTP verified successfully!");
     } catch (err) {
-      setMessage(err.response?.data?.error || "OTP verification failed");
+      toast.error(err.response?.data?.error || "OTP verification failed");
     }
   };
 
   return (
     <Container>
+      <Toaster />
       <div className="flex items-center justify-center min-h-screen">
         <form
           onSubmit={handleSubmit}
@@ -56,9 +57,6 @@ const OtpVerify = () => {
           >
             Verify OTP
           </button>
-          {message && (
-            <div className="mt-4 text-center text-red-500">{message}</div>
-          )}
         </form>
       </div>
     </Container>

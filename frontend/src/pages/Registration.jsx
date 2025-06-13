@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Container from "../components/Container";
 import axios from "axios";
+import toast, { Toaster } from 'react-hot-toast';
 
 const Registration = () => {
   const [form, setForm] = useState({
@@ -9,7 +10,6 @@ const Registration = () => {
     email: "",
     password: "",
   });
-  const [message, setMessage] = useState("");
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -22,15 +22,16 @@ const Registration = () => {
         "http://localhost:5000/api/v1/authentication/registration",
         form
       );
-      setMessage(res.data.message || "Registration successful!");
+      toast.success(res.data.message || "Registration successful!");
       localStorage.setItem("pendingEmail", form.email);
     } catch (err) {
-      setMessage(err.response?.data?.error || "Registration failed");
+      toast.error(err.response?.data?.error || "Registration failed");
     }
   };
 
   return (
     <Container>
+      <Toaster />
       <div className="flex items-center justify-center min-h-screen">
         <form
           className="w-[500px] mx-auto rounded-xl shadow-xl shadow-[#4f44e57c] h-auto p-[20px] border border-[#4f44e541] bg-white"
@@ -106,9 +107,6 @@ const Registration = () => {
           >
             Sign up
           </button>
-          {message && (
-            <div className="mt-4 text-center text-red-500">{message}</div>
-          )}
         </form>
       </div>
     </Container>
