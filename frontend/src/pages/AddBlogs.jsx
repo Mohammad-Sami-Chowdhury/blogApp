@@ -41,7 +41,7 @@ const AddBlogs = () => {
     async function fetchCategories() {
       try {
         const res = await axios.get(
-          "http://localhost:5000/api/v1/category/getallcategory"
+          "https://blogapp-5u1x.onrender.com/api/v1/category/getallcategory"
         );
         setCategories(res.data.data || []);
       } catch (err) {

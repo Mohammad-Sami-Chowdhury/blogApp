@@ -16,7 +16,7 @@ const OtpVerify = () => {
     try {
       // Adjust the endpoint as needed for your backend
       const res = await axios.post(
-        "http://localhost:5000/api/v1/authentication/otpverification",
+        "https://blogapp-5u1x.onrender.com/api/v1/authentication/otpverification",
         { otp, email }
       );
       toast.success(res.data.message || "OTP verified successfully!");

@@ -13,7 +13,7 @@ const Login = () => {
     e.preventDefault();
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/v1/authentication/login",
+        "https://blogapp-5u1x.onrender.com/api/v1/authentication/login",
         {
           email,
           password,

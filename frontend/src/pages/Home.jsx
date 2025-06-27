@@ -17,7 +17,7 @@ const Home = () => {
   useEffect(() => {
     async function fetchCategories() {
       const res = await axios.get(
-        "http://localhost:5000/api/v1/category/getallcategory"
+        "https://blogapp-5u1x.onrender.com/api/v1/category/getallcategory"
       );
       // "All" ke first e add koro
       const arr = Array.isArray(res.data.data) ? res.data.data : [];

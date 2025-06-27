@@ -6,7 +6,7 @@ const Comments = () => {
 
   useEffect(() => {
     async function fetchBlogs() {
-      const res = await axios.get("http://localhost:5000/api/v1/blog/getallblog");
+      const res = await axios.get("https://blogapp-5u1x.onrender.com/api/v1/blog/getallblog");
       setBlogs(res.data.data || []);
     }
     fetchBlogs();

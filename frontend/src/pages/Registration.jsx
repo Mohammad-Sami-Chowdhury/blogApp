@@ -19,7 +19,7 @@ const Registration = () => {
     e.preventDefault();
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/v1/authentication/registration",
+        "https://blogapp-5u1x.onrender.com/api/v1/authentication/registration",
         form
       );
       toast.success(res.data.message || "Registration successful!");

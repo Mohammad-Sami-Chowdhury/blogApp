@@ -26,7 +26,7 @@ const BlogDetails = () => {
       try {
         setLoading(true);
         const res = await axios.get(
-          `http://localhost:5000/api/v1/blog/getsingleblog/${id}`
+          `https://blogapp-5u1x.onrender.com/api/v1/blog/getsingleblog/${id}`
         );
         setBlog(res.data.data);
         setComments(res.data.data.comments || []);
